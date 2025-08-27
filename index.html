@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Aldo • Mappa</title>
+  <meta name="theme-color" content="#0ea5a4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/icons/aldo-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { color-scheme: dark; }
+    body { background: linear-gradient(to bottom, #020617, #0b1220, #020617); }
+    .card { background: rgba(2,6,23,0.6); border:1px solid #1f2937; box-shadow: 0 8px 24px rgba(2,6,23,0.6); }
+  </style>
+</head>
+<body class="text-slate-50 min-h-screen">
+  <header class="sticky top-0 z-20 backdrop-blur bg-slate-950/70 border-b border-slate-800">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/icons/aldo-192.png" alt="Aldo" class="w-7 h-7 rounded-xl">
+        <div class="leading-tight">
+          <h1 class="font-semibold text-base">Aldo • Mappa</h1>
+          <p class="text-[11px] text-teal-300/90">Parola-chiave: <span class="font-medium">RITORNO</span></p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs">
+        <button id="btn-install" class="hidden px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700">Installa</button>
+        <button id="btn-export" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700">Export</button>
+        <label class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 cursor-pointer">Import
+          <input type="file" id="file-import" accept="application/json" class="hidden">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 pt-4 pb-24 space-y-4">
+    <section id="page-checkin" class="space-y-4">
+      <div class="card rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-5 h-5 bg-teal-400/30 rounded"></div>
+          <div>
+            <h2 class="font-semibold leading-tight">Check-in • <span id="today"></span></h2>
+            <p class="text-xs text-slate-400">Energia, intenzione e presenza</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="text-xs text-slate-400">Energia (1–10)</label>
+            <input type="range" id="energy" min="1" max="10" step="1" class="w-full h-10">
+            <div class="text-lg font-semibold mt-1"><span id="energy-val">5</span></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-slate-400">Minuti di presenza (oggi)</label>
+              <input type="number" id="presence" min="0" inputmode="numeric" class="w-full px-4 py-3 rounded-xl bg-slate-800">
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Ore telefono (oggi)</label>
+              <input type="number" id="phone" min="0" step="0.1" inputmode="decimal" class="w-full px-4 py-3 rounded-xl bg-slate-800">
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Interazioni “pure” (n.)</label>
+              <input type="number" id="pure" min="0" inputmode="numeric" class="w-full px-4 py-3 rounded-xl bg-slate-800">
+            </div>
+            <div>
+              <label class="text-xs text-slate-400">Intenzione del giorno</label>
+              <input type="text" id="intention" placeholder="Una cosa che conta…" class="w-full px-4 py-3 rounded-xl bg-slate-800">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-4">
+        <div class="flex items-center justify-between gap-4 mb-2">
+          <div class="text-sm text-slate-400" id="phase">Pronto a partire</div>
+          <div class="font-mono text-xl" id="timer">1:30</div>
+          <button id="btn-timer" class="px-4 py-3 rounded-xl bg-teal-600 text-white active:scale-95">Avvia</button>
+        </div>
+        <div class="mt-3 p-4 rounded-xl bg-gradient-to-r from-teal-900/40 to-indigo-900/30 border border-teal-800/40 text-center text-lg font-semibold text-teal-200 tracking-wide">RITORNO • Io sono</div>
+      </div>
+
+      <div class="card rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-5 h-5 bg-amber-400/30 rounded"></div>
+          <div>
+            <h2 class="font-semibold leading-tight">Routine (3×/settimana)</h2>
+            <p class="text-xs text-slate-400">Spunta quando fatta oggi</p>
+          </div>
+        </div>
+        <div class="grid gap-3">
+          <label class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-sm border-slate-800 bg-slate-900/40">
+            <span>Meditazione 10′</span>
+            <input type="checkbox" id="r-meditation" class="w-5 h-5">
+          </label>
+          <label class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-sm border-slate-800 bg-slate-900/40">
+            <span>Succo detox</span>
+            <input type="checkbox" id="r-juice" class="w-5 h-5">
+          </label>
+          <label class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-sm border-slate-800 bg-slate-900/40">
+            <span>Esercizi facciali</span>
+            <input type="checkbox" id="r-face" class="w-5 h-5">
+          </label>
+          <label class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-sm border-slate-800 bg-slate-900/40">
+            <span>Sessione sport oggi</span>
+            <input type="checkbox" id="sport" class="w-5 h-5">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-dashboard" class="hidden space-y-4">
+      <div class="card rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-5 h-5 bg-teal-400/30 rounded"></div>
+          <div>
+            <h2 class="font-semibold leading-tight">Indicatori della settimana</h2>
+            <p class="text-xs text-slate-400">Review rapida (20′)</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="p-4 rounded-2xl border border-slate-800 bg-slate-900/50">
+            <div class="text-xs text-slate-400 mb-1">Energia media</div>
+            <div class="text-2xl font-semibold"><span id="m-energy">0.0</span><span class="text-base font-normal ml-1">/10</span></div>
+          </div>
+          <div class="p-4 rounded-2xl border border-slate-800 bg-slate-900/50">
+            <div class="text-xs text-slate-400 mb-1">Presenza</div>
+            <div class="text-2xl font-semibold" id="m-presence">0 min</div>
+          </div>
+          <div class="p-4 rounded-2xl border border-amber-500/60 bg-amber-500/10">
+            <div class="text-xs text-slate-400 mb-1">Telefono (media)</div>
+            <div class="text-2xl font-semibold"><span id="m-phone">0.0</span>h</div>
+          </div>
+          <div class="p-4 rounded-2xl border border-slate-800 bg-slate-900/50">
+            <div class="text-xs text-slate-400 mb-1">Interazioni pure</div>
+            <div class="text-2xl font-semibold" id="m-pure">0</div>
+          </div>
+          <div class="p-4 rounded-2xl border border-slate-800 bg-slate-900/50">
+            <div class="text-xs text-slate-400 mb-1">Sport</div>
+            <div class="text-2xl font-semibold" id="m-sport">0</div>
+          </div>
+          <div class="p-4 rounded-2xl border border-slate-800 bg-slate-900/50">
+            <div class="text-xs text-slate-400 mb-1">Giorni routine</div>
+            <div class="text-2xl font-semibold" id="m-routine">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-5 h-5 bg-indigo-400/30 rounded"></div>
+          <div>
+            <h2 class="font-semibold leading-tight">Settimana in corso</h2>
+            <p class="text-xs text-slate-400">Compilazione giornaliera</p>
+          </div>
+        </div>
+        <div id="week-grid" class="grid grid-cols-7 gap-2 text-[11px]"></div>
+      </div>
+
+      <div class="card rounded-2xl p-4">
+        <h2 class="font-semibold mb-2">Domande di riallineamento</h2>
+        <ul class="list-disc pl-5 text-sm space-y-1 text-slate-300">
+          <li>Cosa ha alzato la mia energia?</li>
+          <li>Cosa l’ha abbassata?</li>
+          <li>Cosa taglio subito?</li>
+          <li>Qual è l’unica cosa che, se fatta, rende tutto il resto più facile?</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="page-protocolli" class="hidden space-y-4">
+      <div class="card rounded-2xl p-4">
+        <h2 class="font-semibold mb-2">Anime negative (in situ)</h2>
+        <ol class="list-decimal pl-5 space-y-1 text-sm text-slate-300">
+          <li>Interno: “Lo vedo. Non entra.” Respiro lento.</li>
+          <li>Postura: spalle ampie, mento morbido, sguardo calmo.</li>
+          <li>Frase neutra: “In questo periodo sto proteggendo molto le mie energie.”</li>
+          <li>Azione: spostati di 1–2 metri / cambia micro-cerchio.</li>
+          <li>Dopo: 2’ cammino in silenzio + “RITORNO”.</li>
+        </ol>
+        <div class="mt-3 flex gap-2 text-sm">
+          <button data-copy="Lo vedo. Non entra." class="px-3 py-3 rounded-xl bg-slate-800">Copia frase</button>
+          <button data-copy="In questo periodo sto proteggendo molto le mie energie." class="px-3 py-3 rounded-xl bg-slate-800">Copia frase</button>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-4">
+        <h2 class="font-semibold mb-2">Routine guida (spunta)</h2>
+        <div class="grid gap-3 text-sm text-slate-300">
+          <div>Spunta le azioni fatte oggi nella sezione Check-in.</div>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-4">
+        <h2 class="font-semibold mb-2">Telefono – Reset rapido</h2>
+        <ul class="list-disc pl-5 text-sm space-y-1 text-slate-300">
+          <li>30’ uso → 3 respiri + domanda: “Sto creando o subendo?”</li>
+          <li>1h cumulata → 5’ cammino/respiro oppure 20 piegamenti.</li>
+          <li>Finestra protetta quotidiana: 90’ senza schermi.</li>
+        </ul>
+      </div>
+
+      <div class="card rounded-2xl p-4">
+        <h2 class="font-semibold mb-2">Pineale & Presenza</h2>
+        <ul class="list-disc pl-5 text-sm space-y-1 text-slate-300">
+          <li>No luce blu 90’ prima di dormire; buio/mascherina.</li>
+          <li>5’ luce mattutina naturale (occhi aperti, no occhiali scuri).</li>
+          <li>Respiro nasale lento 3’ la sera; niente sostanze nelle 4h pre-sonno.</li>
+          <li>Facoltativo: coerenza cardiaca 5’ (5″/5″) 1–2×/die.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="page-settings" class="hidden space-y-4">
+      <div class="card rounded-2xl p-4">
+        <h2 class="font-semibold mb-2">Impostazioni</h2>
+        <div class="grid gap-3">
+          <div>
+            <label class="text-xs text-slate-400">Target ore telefono (media/die)</label>
+            <input type="number" id="s-phoneTarget" min="0" step="0.1" class="w-full px-4 py-3 rounded-xl bg-slate-800">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Auto-risparmio (%)</label>
+            <input type="number" id="s-saving" min="0" step="1" class="w-full px-4 py-3 rounded-xl bg-slate-800">
+          </div>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+          <button id="btn-reset" class="px-4 py-3 rounded-xl bg-rose-600 text-white">Azzera dati</button>
+        </div>
+        <div class="mt-3 text-xs text-slate-300 card p-3 rounded-xl">
+          <strong>Installa su iPhone:</strong> apri in <em>Safari</em> → icona <em>Condividi</em> → <em>Aggiungi a Home</em>.
+        </div>
+      </div>
+      <div class="card rounded-2xl p-4">
+        <h2 class="font-semibold mb-2">Note</h2>
+        <ul class="list-disc pl-5 text-sm space-y-1 text-slate-300">
+          <li>Verità solo a chi la onora.</li>
+          <li>Ogni intuizione → una micro-azione entro 24h.</li>
+          <li>“Ho onorato la spirale. Ora scelgo la linea.”</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <nav class="fixed bottom-0 inset-x-0 z-30 border-t border-slate-800 bg-slate-950/95 backdrop-blur">
+    <div class="max-w-md mx-auto grid grid-cols-4">
+      <button data-tab="checkin" class="flex flex-col items-center justify-center gap-1 py-3 text-[11px] text-teal-300">Check-in</button>
+      <button data-tab="dashboard" class="flex flex-col items-center justify-center gap-1 py-3 text-[11px] text-slate-400">Dashboard</button>
+      <button data-tab="protocolli" class="flex flex-col items-center justify-center gap-1 py-3 text-[11px] text-slate-400">Protocolli</button>
+      <button data-tab="settings" class="flex flex-col items-center justify-center gap-1 py-3 text-[11px] text-slate-400">Settaggi</button>
+    </div>
+  </nav>
+
+  <script>
+    let deferredPrompt = null;
+    const btnInstall = document.getElementById('btn-install');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!/iPhone|iPad|iPod/i.test(navigator.userAgent)) btnInstall.classList.remove('hidden');
+    });
+    btnInstall?.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      btnInstall.classList.add('hidden');
+    });
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+    const STORAGE_KEY = 'aldo_mappa_app_v1_pwa';
+    const defaultState = { settings: { savingPercent: 10, phoneTargetHours: 2 }, checkins: {} };
+    let state = defaultState;
+    try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) state = JSON.parse(raw); } catch(e){}
+    const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const iso = new Date(today.getTime() - today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+    document.getElementById('today').textContent = iso;
+    const $ = (id) => document.getElementById(id);
+
+    const energy = $('energy'), energyVal = $('energy-val');
+    const presence = $('presence'), phone = $('phone'), pure = $('pure'), intention = $('intention');
+    const rMeditation = $('r-meditation'), rJuice = $('r-juice'), rFace = $('r-face'), rSport = $('sport');
+    const sPhone = $('s-phoneTarget'), sSaving = $('s-saving');
+
+    function populateToday() {
+      const c = state.checkins[iso] || {};
+      energy.value = c.energy || 5; energyVal.textContent = c.energy || 5;
+      presence.value = c.presenceMin || 0;
+      phone.value = c.phoneHours || 0;
+      pure.value = c.pureInteractions || 0;
+      intention.value = c.intention || '';
+      rMeditation.checked = !!(c.routine && c.routine.meditation);
+      rJuice.checked = !!(c.routine && c.routine.juice);
+      rFace.checked = !!(c.routine && c.routine.face);
+      rSport.checked = !!c.sportSession;
+      sPhone.value = state.settings.phoneTargetHours ?? 2;
+      sSaving.value = state.settings.savingPercent ?? 10;
+    }
+    function patchToday(patch) {
+      const c = state.checkins[iso] || {};
+      state.checkins[iso] = Object.assign({}, c, patch);
+      save();
+      renderWeek();
+      renderMetrics();
+    }
+
+    energy.addEventListener('input', e => { energyVal.textContent = e.target.value; patchToday({ energy: Number(e.target.value) }); });
+    presence.addEventListener('input', e => patchToday({ presenceMin: Number(e.target.value) }));
+    phone.addEventListener('input', e => patchToday({ phoneHours: Number(e.target.value) }));
+    pure.addEventListener('input', e => patchToday({ pureInteractions: Number(e.target.value) }));
+    intention.addEventListener('input', e => patchToday({ intention: e.target.value }));
+    rMeditation.addEventListener('change', e => {
+      const c = state.checkins[iso] || {}; const r = Object.assign({}, c.routine || {}, { meditation: e.target.checked });
+      patchToday({ routine: r });
+    });
+    rJuice.addEventListener('change', e => {
+      const c = state.checkins[iso] || {}; const r = Object.assign({}, c.routine || {}, { juice: e.target.checked });
+      patchToday({ routine: r });
+    });
+    rFace.addEventListener('change', e => {
+      const c = state.checkins[iso] || {}; const r = Object.assign({}, c.routine || {}, { face: e.target.checked });
+      patchToday({ routine: r });
+    });
+    rSport.addEventListener('change', e => patchToday({ sportSession: e.target.checked }));
+    sPhone.addEventListener('input', e => { state.settings.phoneTargetHours = Number(e.target.value); save(); renderMetrics(); renderWeek(); });
+    sSaving.addEventListener('input', e => { state.settings.savingPercent = Number(e.target.value); save(); });
+
+    document.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(btn.getAttribute('data-copy'));
+    }));
+
+    let running = false, tsec = 90, tInt = null;
+    const phase = $('phase'), timer = $('timer'), btnTimer = $('btn-timer');
+    function tick() {
+      tsec -= 1;
+      const mod = (90 - tsec) % 18;
+      if (mod < 4) phase.textContent = 'Inspira 4';
+      else if (mod < 10) phase.textContent = 'Trattieni 6';
+      else phase.textContent = 'Espira 8';
+      timer.textContent = `${Math.floor(tsec/60)}:${String(tsec%60).padStart(2,'0')}`;
+      if (tsec <= 0) stopTimer();
+    }
+    function startTimer() { if (running) return; running = true; tsec = 90; phase.textContent = 'Inspira 4'; timer.textContent = '1:30'; btnTimer.textContent='Stop'; tInt = setInterval(tick, 1000); }
+    function stopTimer() { running = false; clearInterval(tInt); phase.textContent = 'Pronto a partire'; tsec = 90; timer.textContent = '1:30'; btnTimer.textContent='Avvia'; }
+    btnTimer.addEventListener('click', () => running ? stopTimer() : startTimer());
+
+    function monday(d) { const x = new Date(d); const day = (x.getDay() + 6) % 7; x.setDate(x.getDate() - day); x.setHours(0,0,0,0); return x; }
+    const weekGrid = document.getElementById('week-grid');
+    function renderWeek() {
+      const labels = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+      const start = monday(new Date());
+      weekGrid.innerHTML = '';
+      for (let i=0;i<7;i++){ 
+        const d = new Date(start); d.setDate(start.getDate()+i);
+        const k = new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+        const c = state.checkins[k] || {};
+        const done = c.routine && (c.routine.meditation || c.routine.juice || c.routine.face) ? true : false;
+        const energy = (c.energy || 0)*10;
+        const presence = Math.min(100, c.presenceMin || 0);
+        const phone = Math.min(100, (c.phoneHours || 0) * (100 / Math.max(1, state.settings.phoneTargetHours || 1)));
+        const el = document.createElement('div');
+        el.className = 'p-2 rounded-xl bg-slate-800/60 border border-slate-700';
+        el.innerHTML = `
+          <div class="font-semibold mb-1 text-slate-200">${labels[i]}</div>
+          <div class="space-y-1">
+            <div><div class="flex justify-between text-[10px] text-slate-400"><span>Energia</span><span>${Math.round(energy)}%</span></div><div class="h-2 rounded-full bg-slate-800"><div class="h-2 bg-teal-400" style="width:${Math.max(0,Math.min(100,energy))}%"></div></div></div>
+            <div><div class="flex justify-between text-[10px] text-slate-400"><span>Presenza</span><span>${Math.round(presence)}%</span></div><div class="h-2 rounded-full bg-slate-800"><div class="h-2 bg-teal-400" style="width:${Math.max(0,Math.min(100,presence))}%"></div></div></div>
+            <div><div class="flex justify-between text-[10px] text-slate-400"><span>Telefono</span><span>${Math.round(phone)}%</span></div><div class="h-2 rounded-full bg-slate-800"><div class="h-2 bg-amber-400" style="width:${Math.max(0,Math.min(100,phone))}%"></div></div></div>
+            <div class="flex items-center gap-1 mt-1 text-slate-300"><div class="w-3 h-3 rounded-full ${done?'bg-teal-300':'bg-slate-500'}"></div><span>Routine</span></div>
+          </div>`;
+        weekGrid.appendChild(el);
+      }
+    }
+
+    function average(arr){ const nums=arr.filter(x=>typeof x==='number' && !isNaN(x)); if(!nums.length) return 0; return nums.reduce((a,b)=>a+b,0)/nums.length; }
+    function renderMetrics(){
+      const start = monday(new Date());
+      const keys = Array.from({length:7},(_,i)=>{const d=new Date(start); d.setDate(start.getDate()+i); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);});
+      const checks = keys.map(k=>state.checkins[k]||{});
+      const mEnergy = average(checks.map(c=>c.energy));
+      const mPresence = checks.map(c=>c.presenceMin||0).reduce((a,b)=>a+b,0);
+      const mPhone = average(checks.map(c=>c.phoneHours));
+      const mPure = checks.map(c=>c.pureInteractions||0).reduce((a,b)=>a+b,0);
+      const mSport = checks.filter(c=>c.sportSession).length;
+      const mRoutine = checks.filter(c=>c.routine && (c.routine.meditation||c.routine.juice||c.routine.face)).length;
+      document.getElementById('m-energy').textContent = mEnergy.toFixed(1);
+      document.getElementById('m-presence').textContent = mPresence + ' min';
+      document.getElementById('m-phone').textContent = (mPhone||0).toFixed(1);
+      document.getElementById('m-pure').textContent = mPure;
+      document.getElementById('m-sport').textContent = mSport;
+      document.getElementById('m-routine').textContent = mRoutine;
+    }
+
+    const tabs = ['checkin','dashboard','protocolli','settings'];
+    document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{
+      const t = btn.getAttribute('data-tab');
+      tabs.forEach(x => document.getElementById('page-'+x).classList.toggle('hidden', x!==t));
+      document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('text-teal-300', b.getAttribute('data-tab')===t));
+      if (t==='dashboard'){ renderWeek(); renderMetrics(); }
+    }));
+
+    document.getElementById('btn-export').addEventListener('click',()=>{
+      const data = JSON.stringify(state, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'aldo_mappa_export_'+(new Date().toISOString().slice(0,10))+'.json';
+      a.click(); URL.revokeObjectURL(url);
+    });
+    document.getElementById('file-import').addEventListener('change',(e)=>{
+      const file = e.target.files?.[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => { try { state = JSON.parse(reader.result); save(); populateToday(); renderWeek(); renderMetrics(); } catch { alert('File non valido'); } };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('btn-reset').addEventListener('click',()=>{
+      if (!confirm('Sei sicuro di voler azzerare tutti i dati?')) return;
+      state = defaultState; save(); populateToday(); renderWeek(); renderMetrics();
+    });
+
+    populateToday();
+    renderWeek();
+    renderMetrics();
+  </script>
+</body>
+</html>
